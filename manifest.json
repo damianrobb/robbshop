@@ -1,0 +1,24 @@
+{
+  "name": "Robb Shop",
+  "short_name": "Robb Shop",
+  "description": "Meal planning and shopping list for the Robb household",
+  "start_url": "/robb-shop/",
+  "scope": "/robb-shop/",
+  "display": "standalone",
+  "background_color": "#1C1C1E",
+  "theme_color": "#1C1C1E",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/robb-shop/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/robb-shop/icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
