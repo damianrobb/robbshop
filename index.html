@@ -1230,19 +1230,47 @@ function recipeIcon(name, size=32) {
 const DAYS = ['Friday','Saturday','Sunday','Monday','Tuesday','Wednesday','Thursday'];
 
 const INITIAL_RECIPES = [
-  'Butter Halloumi','Halloumi Chicken','Chicken & Pesto Salad',
-  'Asian Chicken & Salad','Greek Chicken & Salad','Salmon and Veg',
-  'Green Curry','Red Curry','Stir-fry','Satay Chicken','Reubens',
-  'Pulled Pork Rolls','Spaghetti Bolognese','Pesto Pasta',
-  'Chorizo and Spinach Pasta','Chilli Con Carne','Burrito Bowl',
-  'Chicken Burrito','Nachos','Homemade Pizzas','BBQ Chicken Rolls',
-  'Sausages and Veg','Curried Sausages','Pea and Ham Soup',
-  'Falafel Wraps','Chicken Schnitzel Wraps','Beef Stew','Souvlakis',
-  'Ramen','Roast Chicken & Veg','Slow Cooker Lamb & Veg',
-  'Halloumi and Mushroom Burger','Beer and Broccoli Slow Cooked',
-  'Paprikash','Mexi Meat','Spicy Red Lentil and Chickpea Soup',
-  'One Pot Mexican Chicken and Rice','Ribollita','Lamb Koftas',
-  'Quick Chicken Pot Pie','Hash Brown Crust Quiche Lorraine'
+    {id:'r1',name:'Butter Halloumi',note:''},
+    {id:'r2',name:'Halloumi Chicken',note:''},
+    {id:'r3',name:'Chicken & Pesto Salad',note:''},
+    {id:'r4',name:'Asian Chicken & Salad',note:''},
+    {id:'r5',name:'Greek Chicken & Salad',note:''},
+    {id:'r6',name:'Salmon and Veg',note:''},
+    {id:'r7',name:'Green Curry',note:''},
+    {id:'r8',name:'Red Curry',note:''},
+    {id:'r9',name:'Stir-fry',note:''},
+    {id:'r10',name:'Satay Chicken',note:''},
+    {id:'r11',name:'Reubens',note:''},
+    {id:'r12',name:'Pulled Pork Rolls',note:''},
+    {id:'r13',name:'Spaghetti Bolognese',note:''},
+    {id:'r14',name:'Pesto Pasta',note:''},
+    {id:'r15',name:'Chorizo and Spinach Pasta',note:''},
+    {id:'r16',name:'Chilli Con Carne',note:''},
+    {id:'r17',name:'Burrito Bowl',note:''},
+    {id:'r18',name:'Chicken Burrito',note:''},
+    {id:'r19',name:'Nachos',note:''},
+    {id:'r20',name:'Homemade Pizzas',note:''},
+    {id:'r21',name:'BBQ Chicken Rolls',note:''},
+    {id:'r22',name:'Sausages and Veg',note:''},
+    {id:'r23',name:'Curried Sausages',note:''},
+    {id:'r24',name:'Pea and Ham Soup',note:''},
+    {id:'r25',name:'Falafel Wraps',note:''},
+    {id:'r26',name:'Chicken Schnitzel Wraps',note:''},
+    {id:'r27',name:'Beef Stew',note:''},
+    {id:'r28',name:'Souvlakis',note:''},
+    {id:'r29',name:'Ramen',note:''},
+    {id:'r30',name:'Roast Chicken & Veg',note:''},
+    {id:'r31',name:'Slow Cooker Lamb & Veg',note:''},
+    {id:'r32',name:'Halloumi and Mushroom Burger',note:''},
+    {id:'r33',name:'Beer and Broccoli Slow Cooked',note:''},
+    {id:'r34',name:'Paprikash',note:''},
+    {id:'r35',name:'Mexi Meat',note:''},
+    {id:'r36',name:'Spicy Red Lentil and Chickpea Soup',note:''},
+    {id:'r37',name:'One Pot Mexican Chicken and Rice',note:''},
+    {id:'r38',name:'Ribollita',note:''},
+    {id:'r39',name:'Lamb Koftas',note:''},
+    {id:'r40',name:'Quick Chicken Pot Pie',note:''},
+    {id:'r41',name:'Hash Brown Crust Quiche Lorraine',note:''}
 ];
 
 // ── STATE ──────────────────────────────────────────────────
@@ -1348,14 +1376,22 @@ async function pullFromSheet() {
         d.recipes
           .filter(r => r.name && r.name.toString().trim())
           .forEach(r => seen.set(r.name.trim().toLowerCase(), r));
-        S.recipes = Array.from(seen.values());
+        const deduped = Array.from(seen.values());
+        // If sheet has suspiciously few recipes, merge with INITIAL_RECIPES
+        if (deduped.length < 20) {
+          const sheetNames = new Set(deduped.map(r => r.name.trim().toLowerCase()));
+          const missing = INITIAL_RECIPES.filter(r => !sheetNames.has(r.name.toLowerCase()));
+          S.recipes = [...deduped, ...missing];
+        } else {
+          S.recipes = deduped;
+        }
       }
       if (d.mealPlan?.length) S.mealPlan = d.mealPlan;
       if (d.shopping?.length) S.shopping = d.shopping.map(i=>({
         ...i, checked: i.checked==='TRUE'||i.checked===true, quantity: parseInt(i.quantity)||1
       }));
       saveLocal(); renderAll();
-      // Push deduped data back to Sheet to clean it up
+      // Always push clean data back to keep Sheet in sync
       await pushToSheet();
     } else {
       // Sheet is empty — push our local data up to it
