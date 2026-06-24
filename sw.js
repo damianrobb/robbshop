@@ -1,11 +1,21 @@
-// Robb Shop Service Worker — minimal, network-first
-const CACHE = 'robb-shop-v1';
+// Robb Shop Service Worker
+const CACHE = 'robb-shop-v2';
+const SCOPE = '/robb-shop/';
 
 self.addEventListener('install', e => {
+  e.waitUntil(
+    caches.open(CACHE).then(cache => cache.add(SCOPE))
+  );
   self.skipWaiting();
 });
 
 self.addEventListener('activate', e => {
+  // Clean up old caches
+  e.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+    )
+  );
   self.clients.claim();
 });
 
